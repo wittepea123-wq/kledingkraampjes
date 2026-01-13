@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <title>Kledingkraampjes Beverwijk & Heemskerk</title>
+
+    <!-- Leaflet CSS -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            text-align: center;
+        }
+
+        header {
+            background-color: #222;
+            color: white;
+            padding: 20px;
+        }
+
+        button {
+            margin: 15px;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #status {
+            font-weight: bold;
+            color: green;
+            display: none;
+        }
+
+        #map {
+            height: 450px;
+            width: 80%;
+            margin: 20px auto;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Kledingkraampjes</h1>
+    <p>Beverwijk & Heemskerk</p>
+</header>
+
+<button onclick="toggleKraampje()">Toon mijn kledingkraampje</button>
+
+<button onclick="window.location.href='kraampje.html'">
+    Kraampje aanmaken
+</button>
+
+<p id="status">✅ Mijn kledingkraampje is zichtbaar</p>
+
+<div id="map"></div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    // Kaart maken (Beverwijk & Heemskerk)
+    const map = L.map('map').setView([52.48, 4.66], 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    // Kleding-icoon (T-shirt)
+    const kraampjeIcoon = L.icon({
+        iconUrl: 'https://cdn-icons-png.flaticon.com/512/892/892458.png',
+        iconSize: [35, 35]
+    });
+
+    // Bestaande kraampjes
+    L.marker([52.483, 4.656], { icon: kraampjeIcoon })
+        .addTo(map)
+        .bindPopup("Kledingkraampje Beverwijk");
+
+    L.marker([52.511, 4.674], { icon: kraampjeIcoon })
+        .addTo(map)
+        .bindPopup("Kledingkraampje Heemskerk");
+
+    // Jouw kraampje (verborgen)
+    const mijnKraampje = L.marker([52.495, 4.665], { icon: kraampjeIcoon })
+        .bindPopup("Mijn kledingkraampje");
+
+    function toggleKraampje() {
+        const status = document.getElementById("status");
+
+        if (map.hasLayer(mijnKraampje)) {
+            map.removeLayer(mijnKraampje);
+            status.style.display = "none";
+        } else {
+            mijnKraampje.addTo(map);
+            status.style.display = "block";
+        }
+    }
+</script>
+
+</body>
+</html>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
