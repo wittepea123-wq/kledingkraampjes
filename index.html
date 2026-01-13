@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <title>Kledingkraampjes Kaart</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .form-container {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Kledingkraampjes rond Heemskerk & Beverwijk</h2>
+
+<div class="form-container">
+    <h3>Eigen kraampje toevoegen</h3>
+    <label>Beschrijving: </label>
+    <input type="text" id="descInput" placeholder="Beschrijving van je kraampje">
+    <button onclick="enablePlacement()">Plaats kraampje op de kaart</button>
+</div>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+
+// --- ICONEN ---
+const otherIcon = L.icon({
+    iconUrl: "https://cdn-icons-png.flaticon.com/512/892/892458.png",
+    iconSize: [32, 32]
+});
+
+const myIcon = L.icon({
+    iconUrl: "https://cdn-icons-png.flaticon.com/512/892/892458.png",
+    iconSize: [32, 32],
+    className: "my-stall-icon"
+});
+
+// Groen tintje via CSS filter
+const style = document.createElement("style");
+style.innerHTML = `
+    .my-stall-icon {
+        filter: hue-rotate(80deg) brightness(1.2);
+    }
+`;
+document.head.appendChild(style);
+
+
+// --- KAART ---
+const map = L.map('map').setView([52.502, 4.67], 13);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19
+}).addTo(map);
+
+
+// --- STANDAARD KRAAMPJES ---
+const stalls = [
+    { lat: 52.511, lng: 4.671, desc: "Kraampje bij station Heemskerk" },
+    { lat: 52.493, lng: 4.656, desc: "Kraampje in Beverwijk centrum" },
+    { lat: 52.505, lng: 4.685, desc: "Kraampje bij de Bazaar" }
+];
+
+stalls.forEach(s => {
+    L.marker([s.lat, s.lng], { icon: otherIcon })
+        .addTo(map)
+        .bindPopup(`<b>Kraampje</b><br>${s.desc}`);
+});
+
+
+// --- EIGEN KRAAMPJE ---
+let placing = false;
+let myMarker = null;
+let myDescription = "";
+
+function enablePlacement() {
+    myDescription = document.getElementById("descInput").value.trim();
+    if (myDescription === "") {
+        alert("Voer eerst een beschrijving in.");
+        return;
+    }
+    placing = true;
+    alert("Klik op de kaart om je kraampje te plaatsen.");
+}
+
+map.on("click", function(e) {
+    if (!placing) return;
+
+    if (myMarker) {
+        map.removeLayer(myMarker);
+    }
+
+    myMarker = L.marker(e.latlng, { icon: myIcon }).addTo(map);
+
+    myMarker.bindPopup(`
+        <b>Mijn kraampje</b><br>
+        ${myDescription}<br><br>
+        <button onclick="editDescription()">Beschrijving wijzigen</button>
+    `);
+
+    placing = false;
+});
+
+function editDescription() {
+    const newDesc = prompt("Nieuwe beschrijving:", myDescription);
+    if (newDesc !== null && newDesc.trim() !== "") {
+        myDescription = newDesc.trim();
+        myMarker.setPopupContent(`
+            <b>Mijn kraampje</b><br>
+            ${myDescription}<br><br>
+            <button onclick="editDescription()">Beschrijving wijzigen</button>
+        `);
+    }
+}
+
+</script>
+
+</body>
+</html>
